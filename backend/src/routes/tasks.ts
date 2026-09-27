@@ -21,7 +21,7 @@ taskRouter.get("/", async (req: AuthRequest, res: Response) => {
       whereCondition.status = status as string;
     }
     if (due_date) {
-      whereCondition.due_date = due_date as string;
+      whereCondition.due_date = new Date(due_date as string);
     }
     if (category) {
       whereCondition.category = category as string;
