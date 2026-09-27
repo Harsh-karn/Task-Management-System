@@ -22,20 +22,22 @@ const Login: React.FC = () => {
 
   return (
     <div className="auth-container">
-      <h2>Log In</h2>
-      <form onSubmit={handleLogin} className="auth-form">
-        {error && <p className="error-message">{error}</p>}
-        <div className="form-group">
-          <label>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </div>
-        <div className="form-group">
-          <label>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </div>
-        <button type="submit" className="primary-btn">Log In</button>
-      </form>
-      <p>Don't have an account? <Link to="/register">Register here</Link></p>
+      <div className="auth-box">
+        <h2>Log In</h2>
+        <form onSubmit={handleLogin} className="auth-form">
+          {error && <p className="error-message">{error}</p>}
+          <div className="form-group">
+            <label>Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </div>
+          <button type="submit" className="primary-btn">Log In</button>
+        </form>
+        <p className="auth-link">Don't have an account? <Link to="/register">Register here</Link></p>
+      </div>
     </div>
   );
 };
