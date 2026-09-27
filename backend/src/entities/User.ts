@@ -6,13 +6,13 @@ export class User {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ unique: true })
+  @Column({ type: "varchar", unique: true })
   email!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   password_hash!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   refresh_token!: string;
 
   @OneToMany(() => Task, (task) => task.user)

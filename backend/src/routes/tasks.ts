@@ -63,7 +63,7 @@ taskRouter.put(
        return;
     }
 
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     const { title, description, status, due_date } = req.body;
 
     try {
@@ -88,7 +88,7 @@ taskRouter.put(
 
 // Delete a task
 taskRouter.delete("/:id", async (req: AuthRequest, res: Response) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   try {
     const task = await taskRepository.findOneBy({ id, user_id: req.user?.id });
     if (!task) {

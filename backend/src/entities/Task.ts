@@ -6,13 +6,13 @@ export class Task {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   title!: string;
 
   @Column({ type: "text", nullable: true })
   description!: string;
 
-  @Column({ default: "pending" })
+  @Column({ type: "varchar", default: "pending" })
   status!: string;
 
   @Column({ type: "date", nullable: true })
@@ -22,7 +22,7 @@ export class Task {
   @JoinColumn({ name: "user_id" })
   user!: User;
 
-  @Column()
+  @Column({ type: "integer" })
   user_id!: number;
 
   @CreateDateColumn()
