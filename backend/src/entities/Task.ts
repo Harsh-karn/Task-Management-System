@@ -18,6 +18,9 @@ export class Task {
   @Column({ type: "date", nullable: true })
   due_date!: Date;
 
+  @Column({ type: "varchar", nullable: true })
+  category!: string;
+
   @ManyToOne(() => User, (user) => user.tasks, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
   user!: User;

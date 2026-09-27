@@ -14,6 +14,7 @@ const Dashboard: React.FC = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [dueDateFilter, setDueDateFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
   
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -32,6 +33,7 @@ const Dashboard: React.FC = () => {
       if (search) params.append('search', search);
       if (statusFilter) params.append('status', statusFilter);
       if (dueDateFilter) params.append('due_date', dueDateFilter);
+      if (categoryFilter) params.append('category', categoryFilter);
       params.append('page', page.toString());
       
       const response = await api.get(`/tasks?${params.toString()}`);
@@ -46,11 +48,11 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, dueDateFilter]);
+  }, [search, statusFilter, dueDateFilter, categoryFilter]);
 
   useEffect(() => {
     fetchTasks();
-  }, [search, statusFilter, dueDateFilter, page]);
+  }, [search, statusFilter, dueDateFilter, categoryFilter, page]);
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this task?')) {
@@ -118,6 +120,13 @@ const Dashboard: React.FC = () => {
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
         </select>
+        <input 
+          type="text" 
+          placeholder="Filter by category..." 
+          value={categoryFilter} 
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="filter-input category-input"
+        />
         <div className="date-filter-wrapper">
           <span className="date-filter-label">Due:</span>
           <input 
@@ -150,7 +159,10 @@ const Dashboard: React.FC = () => {
                 <h3>{task.title}</h3>
                 {task.description && <p className="task-description">{task.description}</p>}
                 {task.due_date && <p className="task-due-date">Due: {new Date(task.due_date).toLocaleDateString()}</p>}
-                <span className={`status-badge ${task.status}`}>{task.status}</span>
+                <div className="task-badges">
+                  <span className={`status-badge ${task.status}`}>{task.status}</span>
+                  {task.category && <span className="category-badge">{task.category}</span>}
+                </div>
               </div>
               <div className="task-actions">
                 <button onClick={() => handleToggleStatus(task)} className="action-btn">

@@ -13,7 +13,7 @@ taskRouter.use(authenticateJWT);
 // Get all tasks for the logged in user
 taskRouter.get("/", async (req: AuthRequest, res: Response) => {
   try {
-    const { search, status, due_date } = req.query;
+    const { search, status, due_date, category } = req.query;
     
     const whereCondition: FindOptionsWhere<Task> = { user_id: req.user?.id };
 
@@ -22,6 +22,9 @@ taskRouter.get("/", async (req: AuthRequest, res: Response) => {
     }
     if (due_date) {
       whereCondition.due_date = due_date as string;
+    }
+    if (category) {
+      whereCondition.category = category as string;
     }
     if (search) {
       whereCondition.title = ILike(`%${search}%`);
@@ -60,13 +63,14 @@ taskRouter.post(
        return;
     }
 
-    const { title, description, due_date } = req.body;
+    const { title, description, due_date, category } = req.body;
 
     try {
       const task = taskRepository.create({
         title,
         description,
         due_date,
+        category,
         user_id: req.user?.id,
         status: "pending",
       });
@@ -91,7 +95,7 @@ taskRouter.put(
     }
 
     const id = parseInt(req.params.id as string);
-    const { title, description, status, due_date } = req.body;
+    const { title, description, status, due_date, category } = req.body;
 
     try {
       const task = await taskRepository.findOneBy({ id, user_id: req.user?.id });
@@ -104,6 +108,7 @@ taskRouter.put(
       if (description !== undefined) task.description = description;
       if (status !== undefined) task.status = status;
       if (due_date !== undefined) task.due_date = due_date;
+      if (category !== undefined) task.category = category;
 
       await taskRepository.save(task);
       res.json(task);

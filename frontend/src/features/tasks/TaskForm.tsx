@@ -12,6 +12,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onClose, onSuccess }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [category, setCategory] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onClose, onSuccess }) => {
       setTitle(task.title);
       setDescription(task.description || '');
       setDueDate(task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '');
+      setCategory(task.category || '');
     }
   }, [task]);
 
@@ -30,7 +32,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onClose, onSuccess }) => {
       const payload = { 
         title, 
         description: description || null, 
-        due_date: dueDate || null 
+        due_date: dueDate || null,
+        category: category || null
       };
 
       if (task) {
@@ -65,6 +68,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onClose, onSuccess }) => {
           <div className="form-group">
             <label>Due Date</label>
             <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label>Category / Tag</label>
+            <input type="text" placeholder="e.g. Work, Personal, Urgent" value={category} onChange={e => setCategory(e.target.value)} />
           </div>
           <div className="form-actions">
             <button type="button" onClick={onClose} className="secondary-btn">Cancel</button>
