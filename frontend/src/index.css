@@ -382,3 +382,17 @@ button {
   font-weight: bold;
   font-size: 1.1rem;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 2rem;
+}
+
+.page-info {
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}

@@ -14,6 +14,9 @@ const Dashboard: React.FC = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [dueDateFilter, setDueDateFilter] = useState('');
+  
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const navigate = useNavigate();
 
@@ -29,9 +32,11 @@ const Dashboard: React.FC = () => {
       if (search) params.append('search', search);
       if (statusFilter) params.append('status', statusFilter);
       if (dueDateFilter) params.append('due_date', dueDateFilter);
+      params.append('page', page.toString());
       
       const response = await api.get(`/tasks?${params.toString()}`);
-      setTasks(response.data);
+      setTasks(response.data.data);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('Failed to fetch tasks', error);
     } finally {
@@ -40,8 +45,12 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTasks();
+    setPage(1);
   }, [search, statusFilter, dueDateFilter]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [search, statusFilter, dueDateFilter, page]);
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this task?')) {
@@ -158,6 +167,26 @@ const Dashboard: React.FC = () => {
           ))
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            disabled={page === 1} 
+            onClick={() => setPage(page - 1)}
+            className="secondary-btn"
+          >
+            Previous
+          </button>
+          <span className="page-info">Page {page} of {totalPages}</span>
+          <button 
+            disabled={page === totalPages} 
+            onClick={() => setPage(page + 1)}
+            className="secondary-btn"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

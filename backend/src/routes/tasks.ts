@@ -27,11 +27,23 @@ taskRouter.get("/", async (req: AuthRequest, res: Response) => {
       whereCondition.title = ILike(`%${search}%`);
     }
 
-    const tasks = await taskRepository.find({
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 9; // Default 9 tasks per page
+    const skip = (page - 1) * limit;
+
+    const [tasks, total] = await taskRepository.findAndCount({
       where: whereCondition,
       order: { created_at: "DESC" },
+      take: limit,
+      skip: skip,
     });
-    res.json(tasks);
+
+    res.json({
+      data: tasks,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
+    });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
