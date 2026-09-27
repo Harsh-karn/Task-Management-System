@@ -1,0 +1,103 @@
+import { Router, Response } from "express";
+import { body, validationResult } from "express-validator";
+import { AppDataSource } from "../data-source";
+import { Task } from "../entities/Task";
+import { authenticateJWT, AuthRequest } from "../middleware/auth";
+
+export const taskRouter = Router();
+const taskRepository = AppDataSource.getRepository(Task);
+
+taskRouter.use(authenticateJWT);
+
+// Get all tasks for the logged in user
+taskRouter.get("/", async (req: AuthRequest, res: Response) => {
+  try {
+    const tasks = await taskRepository.find({
+      where: { user_id: req.user?.id },
+      order: { created_at: "DESC" },
+    });
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Create a task
+taskRouter.post(
+  "/",
+  body("title").notEmpty().withMessage("Title is required"),
+  async (req: AuthRequest, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+       res.status(400).json({ errors: errors.array() });
+       return;
+    }
+
+    const { title, description, due_date } = req.body;
+
+    try {
+      const task = taskRepository.create({
+        title,
+        description,
+        due_date,
+        user_id: req.user?.id,
+        status: "pending",
+      });
+      await taskRepository.save(task);
+      res.status(201).json(task);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
+
+// Update a task
+taskRouter.put(
+  "/:id",
+  body("title").optional().notEmpty(),
+  body("status").optional().isIn(["pending", "completed"]),
+  async (req: AuthRequest, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+       res.status(400).json({ errors: errors.array() });
+       return;
+    }
+
+    const id = parseInt(req.params.id);
+    const { title, description, status, due_date } = req.body;
+
+    try {
+      const task = await taskRepository.findOneBy({ id, user_id: req.user?.id });
+      if (!task) {
+         res.status(404).json({ error: "Task not found" });
+         return;
+      }
+
+      if (title !== undefined) task.title = title;
+      if (description !== undefined) task.description = description;
+      if (status !== undefined) task.status = status;
+      if (due_date !== undefined) task.due_date = due_date;
+
+      await taskRepository.save(task);
+      res.json(task);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
+
+// Delete a task
+taskRouter.delete("/:id", async (req: AuthRequest, res: Response) => {
+  const id = parseInt(req.params.id);
+  try {
+    const task = await taskRepository.findOneBy({ id, user_id: req.user?.id });
+    if (!task) {
+       res.status(404).json({ error: "Task not found" });
+       return;
+    }
+    await taskRepository.remove(task);
+    res.json({ message: "Task deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
