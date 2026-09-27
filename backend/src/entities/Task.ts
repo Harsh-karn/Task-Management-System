@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from "typeorm";
 import { User } from "./User";
 
 @Entity("tasks")
@@ -12,6 +12,7 @@ export class Task {
   @Column({ type: "text", nullable: true })
   description!: string;
 
+  @Index()
   @Column({ type: "varchar", default: "pending" })
   status!: string;
 
@@ -25,6 +26,7 @@ export class Task {
   @JoinColumn({ name: "user_id" })
   user!: User;
 
+  @Index()
   @Column({ type: "integer" })
   user_id!: number;
 
