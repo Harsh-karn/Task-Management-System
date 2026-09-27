@@ -4,7 +4,7 @@ import Login from './features/auth/Login';
 import Register from './features/auth/Register';
 import Dashboard from './features/tasks/Dashboard';
 
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('accessToken');
   if (!token) {
     return <Navigate to="/login" replace />;
