@@ -19,7 +19,7 @@ exports.taskRouter.get("/", async (req, res) => {
             whereCondition.status = status;
         }
         if (due_date) {
-            whereCondition.due_date = due_date;
+            whereCondition.due_date = new Date(due_date);
         }
         if (category) {
             whereCondition.category = category;
