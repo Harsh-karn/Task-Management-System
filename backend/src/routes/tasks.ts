@@ -1,5 +1,6 @@
 import { Router, Response } from "express";
 import { body, validationResult } from "express-validator";
+import { ILike, FindOptionsWhere } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { Task } from "../entities/Task";
 import { authenticateJWT, AuthRequest } from "../middleware/auth";
@@ -12,8 +13,22 @@ taskRouter.use(authenticateJWT);
 // Get all tasks for the logged in user
 taskRouter.get("/", async (req: AuthRequest, res: Response) => {
   try {
+    const { search, status, due_date } = req.query;
+    
+    const whereCondition: FindOptionsWhere<Task> = { user_id: req.user?.id };
+
+    if (status) {
+      whereCondition.status = status as string;
+    }
+    if (due_date) {
+      whereCondition.due_date = due_date as string;
+    }
+    if (search) {
+      whereCondition.title = ILike(`%${search}%`);
+    }
+
     const tasks = await taskRepository.find({
-      where: { user_id: req.user?.id },
+      where: whereCondition,
       order: { created_at: "DESC" },
     });
     res.json(tasks);

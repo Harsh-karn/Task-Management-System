@@ -9,12 +9,28 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [dueDateFilter, setDueDateFilter] = useState('');
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(searchInput), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/tasks');
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (statusFilter) params.append('status', statusFilter);
+      if (dueDateFilter) params.append('due_date', dueDateFilter);
+      
+      const response = await api.get(`/tasks?${params.toString()}`);
       setTasks(response.data);
     } catch (error) {
       console.error('Failed to fetch tasks', error);
@@ -25,7 +41,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [search, statusFilter, dueDateFilter]);
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this task?')) {
@@ -74,6 +90,37 @@ const Dashboard: React.FC = () => {
         <button onClick={() => { setEditingTask(null); setShowForm(true); }} className="primary-btn">
           Add New Task
         </button>
+      </div>
+
+      <div className="filters-container">
+        <input 
+          type="text" 
+          placeholder="Search tasks..." 
+          value={searchInput} 
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="filter-input search-input"
+        />
+        <select 
+          value={statusFilter} 
+          onChange={(e) => setStatusFilter(e.target.value)} 
+          className="filter-input"
+        >
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+        </select>
+        <div className="date-filter-wrapper">
+          <span className="date-filter-label">Due:</span>
+          <input 
+            type="date" 
+            value={dueDateFilter} 
+            onChange={(e) => setDueDateFilter(e.target.value)}
+            className="filter-input date-input"
+          />
+          {dueDateFilter && (
+            <button className="clear-date-btn" onClick={() => setDueDateFilter('')}>✕</button>
+          )}
+        </div>
       </div>
 
       {showForm && (
